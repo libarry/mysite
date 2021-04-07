@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'social_django',
 
+    'novels.apps.NovelsConfig'
+
 ]
 
 # When we get to crispy forms :)

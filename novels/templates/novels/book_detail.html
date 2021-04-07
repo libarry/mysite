@@ -1,0 +1,104 @@
+{% extends "base_menu.html" %}
+{% load humanize %} <!-- https://docs.djangoproject.com/en/3.0/ref/contrib/humanize -->
+{% block head %}
+<style>
+.overlay{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  display: none;
+  background-color: rgba(0,0,0,0.5); /*dim the background*/
+}
+#tag_list
+{
+display:block;
+white-space:nowrap;
+width:500px;
+overflow:auto;
+}
+#tag_list li
+{
+width:80px;
+height:80px;
+margin:3px;
+background:red;
+display:inline-block;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% if book.content_type %}
+    <div id="overlay" class="overlay" style="text-align: center;"
+       onclick="document.getElementById('overlay').style.display = 'none';" >
+        <img style="width:90%;margin-top: 50px; border:3px solid black;" src="{% url 'novels:book_cover' book.id %}">
+    </div>
+{% endif %}
+
+<span style="float: right;">
+    ({{ book.updated_at|naturaltime }})
+    {% if book.owner == user %}
+        <a href="{% url 'novels:book_update' book.id %}"><i class="fa fa-pencil"></i></a>
+        <a href="{% url 'novels:book_delete' book.id %}"><i class="fa fa-trash"></i></a>
+    {% endif %}
+</span>
+<h1>{{ book.title }}</h1>
+{% if book.content_type %}
+<img style="float:right; max-width:50%;" src="{% url 'novels:book_cover' book.id %}"
+    onclick="document.getElementById('overlay').style.display = 'block';">
+{% endif %}
+<div id="tag_list">
+    <ul>
+        {% for tag in tags %}
+        <li>
+            {{ tag.name }}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<p>
+{{ ad.description }}
+</p>
+{% if book.owner == user %}
+    <p>
+    <a href="{% url 'novels:chapter_create' book.id%}">Add a chapter</a>
+    </p>
+{% endif %}
+
+<ul>
+    {% for chapter in chapters %}
+    <li>
+        <a href="{% url 'novels:chapter_detial' book.id chapter.id %}">  {{ chapter.name }} </a>
+    </li>
+    {% endfor %}
+</ul>
+
+{% if user.is_authenticated %}
+<br clear="all"/>
+<p>
+{% load crispy_forms_tags %}
+    <form method="post" action="{% url 'novels:book_comment_create' book.id %}">
+    {% csrf_token %}
+    {{ comment_form|crispy }}
+    <input type="submit" value="Submit">
+    {#<input type="submit" value="All Books" onclick="window.location.href='{% url 'novels:all' %}';return false;">#}
+    </form>
+</p>
+{% endif %}
+
+{% for comment in comments %}
+<p> {{ comment.text }}
+({{ comment.updated_at|naturaltime }})
+{% if user == comment.owner %}
+<a href="{% url 'novels:book_comment_delete' comment.id %}"><i class="fa fa-trash"></i></a>
+{% endif %}
+</p>
+<p>                                                                                                {% endfor %}
+<a href="{% url 'novels:all' %}">All books</a>
+</p>
+{% endblock %}

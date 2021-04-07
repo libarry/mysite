@@ -1,0 +1,25 @@
+{% extends "base_menu.html" %}
+{% block content %}
+
+<h1>{{ chapter.title }}</h1>
+
+<span style="float: right;">
+    ({{ chapter.updated_at|naturaltime }})
+    {% if book.owner == user %}
+        <a href="{% url 'novels:chapter_update' chapter.id %}"><i class="fa fa-pencil"></i></a>
+        <a href="{% url 'novels:chapter_delete' chapter.id %}"><i class="fa fa-trash"></i></a>
+    {% endif %}
+</span>
+
+<p>
+{{ chapter.text }}
+</p>
+
+<p>
+    <a href="{% url 'novels:book_detail' chapter.book.id%}">Go back</a>
+</p>
+
+<p>
+    <a href="{% url 'novels:all' %}">All books</a>
+</p>
+{% endblock %}
