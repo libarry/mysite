@@ -34,7 +34,7 @@ class CreateBookForm(forms.ModelForm):
         instance = super(CreateBookForm, self).save(commit=False)
 
         # We only need to adjust picture if it is a freshly uploaded file
-        f = instance.picture  # Make a copy
+        f = instance.cover  # Make a copy
         if isinstance(f, InMemoryUploadedFile):  # Extract data from the form to the model
             bytearr = f.read()
             instance.content_type = f.content_type
