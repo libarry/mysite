@@ -56,7 +56,7 @@ class Chapter(models.Model):
     text = models.TextField(
         validators=[MinLengthValidator(50, "content must be greater than 50 characters")]
     )
-    book = models.ForeignKey(Book, on_delete=models.SET_NULL)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
