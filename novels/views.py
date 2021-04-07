@@ -93,7 +93,7 @@ class BookUpdateView(LoginRequiredMixin, View):
         return redirect(success_url)
 
 
-class ChapterDetail(OwnerDetailView):
+class ChapterDetailView(OwnerDetailView):
     model = Chapter
     template_name = 'novels/chapter_detail.html'
 
