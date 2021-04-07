@@ -14,7 +14,7 @@ class CreateBookForm(forms.ModelForm):
     # It will not be the "bytes", it will be the "InMemoryUploadedFile"
     # because we need to pull out things like content_type
     cover = forms.FileField(required=False, label='File to Upload <= '+max_upload_limit_text)
-    upload_field_name = 'picture'
+    upload_field_name = 'cover'
 
     # Hint: this will need to be changed for use in the ads application :)
     class Meta:
@@ -24,10 +24,10 @@ class CreateBookForm(forms.ModelForm):
         # Validate the size of the picture                                                                  def clean(self):
     def clean(self):
         cleaned_data = super().clean()
-        pic = cleaned_data.get('picture')
+        pic = cleaned_data.get('cover')
         if pic is None:                                                                                         return
         if len(pic) > self.max_upload_limit:
-            self.add_error('picture', "File must be < " + self.max_upload_limit_text + " bytes")
+            self.add_error('cover', "File must be < " + self.max_upload_limit_text + " bytes")
 
     # Convert uploaded File object to a picture
     def save(self, commit=True):
@@ -38,7 +38,7 @@ class CreateBookForm(forms.ModelForm):
         if isinstance(f, InMemoryUploadedFile):  # Extract data from the form to the model
             bytearr = f.read()
             instance.content_type = f.content_type
-            instance.picture = bytearr  # Overwrite with the actual image data
+            instance.cover = bytearr  # Overwrite with the actual image data
 
         if commit:
             instance.save()

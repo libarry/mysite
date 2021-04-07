@@ -36,7 +36,7 @@ class BookDetailView(OwnerDetailView):
         comments = Comment.objects.filter(book=x).order_by('-updated_at')
         tags = Tag.objects.filter(book=x)
         chapters = Chapter.objects.filter(book=x).order_by('-created_at')
-        comment_form = CreateBookForm()
+        comment_form = CommentForm()
         context = {'book': x, 'comments': comments, 'comment_form': comment_form,
                     'chapters': chapters, 'tags':tags}
         return render(request, self.template_name, context)
