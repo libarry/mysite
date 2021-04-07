@@ -73,7 +73,7 @@ display:inline-block;
 <ul>
     {% for chapter in chapters %}
     <li>
-        <a href="{% url 'novels:chapter_detial' book.id chapter.id %}">  {{ chapter.name }} </a>
+        <a href="{% url 'novels:chapter_detail' book.id chapter.id %}">  {{ chapter.name }} </a>
     </li>
     {% endfor %}
 </ul>
