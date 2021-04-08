@@ -5,7 +5,14 @@ from django.conf import settings
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
@@ -13,16 +20,16 @@ class Tag(models.Model):
 
 class Book(models.Model) :
     title = models.CharField(
-            max_length=200,
+            max_length=255,
             validators=[MinLengthValidator(2, "Title must be greater than 2 characters")]
     )
     description = models.TextField()
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
-
+    category = models.ForeignKey(Category,null=True,on_delete=models.SET_NULL)
     # Picture
     cover = models.BinaryField(null=True, editable=True)
-    content_type = models.CharField(max_length=256, null=True, help_text='The MIMEType of the file')
+    content_type = models.CharField(max_length=255, null=True, help_text='The MIMEType of the file')
 
     comments = models.ManyToManyField(settings.AUTH_USER_MODEL,
                        through='Comment', related_name='comments_owned')

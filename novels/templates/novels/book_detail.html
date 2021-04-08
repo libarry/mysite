@@ -51,6 +51,10 @@ display:inline-block;
 <img style="float:right; max-width:50%;" src="{% url 'novels:book_cover' book.id %}"
     onclick="document.getElementById('overlay').style.display = 'block';">
 {% endif %}
+
+<p>Category: {{ book.category }}</p>
+<p>{{ ad.description }}</p>
+
 <div id="tag_list">
     <ul>
         {% for tag in tags %}
@@ -61,9 +65,7 @@ display:inline-block;
     </ul>
 </div>
 
-<p>
-{{ ad.description }}
-</p>
+
 {% if book.owner == user %}
     <p>
     <a href="{% url 'novels:chapter_create' book.id%}">Add a chapter</a>

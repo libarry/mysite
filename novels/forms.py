@@ -19,7 +19,7 @@ class CreateBookForm(forms.ModelForm):
     # Hint: this will need to be changed for use in the ads application :)
     class Meta:
         model = Book
-        fields = ['title','tags', 'description','cover']  # Picture is manual
+        fields = ['title','category', 'description','cover']  # Picture is manual
 
         # Validate the size of the picture                                                                  def clean(self):
     def clean(self):
