@@ -1,12 +1,13 @@
-from novels.models import Book,Comment,Chapter,Tag,Fav
+from novels.models import Book,Comment,Chapter,Tag,Fav,SignIn,Gifted
 from novels.owner import OwnerListView, OwnerDetailView, OwnerCreateView, OwnerUpdateView, OwnerDeleteView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.views import View
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy,reverse
 from django.http import HttpResponse,JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from novels.forms import CreateBookForm,CreateChapterForm,CommentForm
+from novels.forms import CreateBookForm,CreateChapterForm, CommentForm, CreateSignInForm
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.db.utils import IntegrityError
@@ -32,6 +33,9 @@ def tagJsonDel(request):
     return JsonResponse({None:None})
 
 
+
+
+
 def tag_list(request,tag_name):
     print(tag_name)
     template_name = "novels/book_list_back.html"
@@ -46,6 +50,34 @@ def tag_list(request,tag_name):
         favorites = [row['id'] for row in rows]
     ctx = {'title': title, 'book_list': book_list, 'favorites': favorites}
     return render(request, template_name, ctx)
+
+
+class SignInListView(ListView):
+    model = SignIn
+    template_name = "novels/signin_list.html"
+
+    def get(self, request) :
+        signIn_list = SignIn.objects.all()
+        ctx = {'signIn_list': signIn_list}
+        return render(request, self.template_name, ctx)
+
+class SignInCreateView(LoginRequiredMixin, View):
+    template_name = "novels/signin_create.html"
+
+    def get(self, request, pk=None):
+        form = CreateSignInForm()
+        ctx = {'form': form}
+        return render(request, self.template_name, ctx)
+
+    def post(self, request):
+        form = CreateSignInForm(request.POST, request.FILES or None)
+
+        # Add owner to the model before saving
+        pic = form.save(commit=False)
+        pic.user = self.request.user
+        pic.user.user_info.flowers += 1
+        pic.save()
+        return redirect(reverse_lazy('novels:signin_list'))
 
 
 class BookListView(OwnerListView):
@@ -64,7 +96,7 @@ class BookListView(OwnerListView):
         return render(request, self.template_name, ctx)
 
 
-class BookDetailView(OwnerDetailView):
+class BookDetailView(LoginRequiredMixin, View):
     model = Book
     template_name = 'novels/book_detail.html'
 
@@ -78,6 +110,19 @@ class BookDetailView(OwnerDetailView):
                     'chapters': chapters, 'tags':tags}
         return render(request, self.template_name, context)
 
+    def post(self, request, pk):
+        flower = int(request.POST.get('number'))
+        book = Book.objects.get(id=pk)
+        user = request.user
+        user.user_info.flowers -= flower
+        book.owner.user_info.flowers += flower
+        book.flowers += flower
+        gifted = Gifted(flower=flower, recipient=book, giver=user)
+        gifted.save()
+        book.save()
+        user.user_info.save()
+        book.owner.user_info.save()
+        return redirect(reverse_lazy('novels:book_detail', kwargs={'pk': book.id}))
 
 class BookDeleteView(OwnerDeleteView):
     model = Book
@@ -91,6 +136,7 @@ class BookCreateView(LoginRequiredMixin, View):
     template_name = 'novels/book_form.html'
 
     def get(self, request, pk=None):
+        success_url = request.GET.get('next')
         form = CreateBookForm()
         ctx = {'form': form}
         return render(request, self.template_name, ctx)
@@ -105,6 +151,7 @@ class BookCreateView(LoginRequiredMixin, View):
         # Add owner to the model before saving
         pic = form.save(commit=False)
         pic.owner = self.request.user
+        pic.flower = 0
         pic.save()
         success_url = reverse_lazy('novels:book_detail', kwargs={'pk': pic.id})
         return redirect(success_url)

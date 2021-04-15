@@ -37,4 +37,6 @@ urlpatterns = [
     path('book/<int:pk>/unfavorite',
         views.DeleteFavoriteView.as_view(), name='book_unfavorite'),
 
+    path('signin-list',views.SignInListView.as_view(), name='signin_list'),
+    path('signin',views.SignInCreateView.as_view(),name='signin_create'),
     ]

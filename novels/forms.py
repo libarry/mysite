@@ -1,5 +1,5 @@
 from django import forms
-from novels.models import Book,Chapter
+from novels.models import Book,Chapter,SignIn
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from novels.humanize import naturalsize
 from django.core.exceptions import ValidationError
@@ -49,7 +49,14 @@ class CreateBookForm(forms.ModelForm):
 class CreateChapterForm(forms.ModelForm):
     class Meta:
         model = Chapter
-        fields = ['name','text']  # Picture is manual
+        fields = ['name','text']
+
+
+class CreateSignInForm(forms.ModelForm):
+    class Meta:
+        model = SignIn
+        fields = ['text']
+
 
 class CommentForm(forms.Form):
     comment = forms.CharField(required=True, max_length=500, min_length=3, strip=True)

@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinLengthValidator,MaxLengthValidator
+from django.core.validators import MinLengthValidator,MaxLengthValidator,MinValueValidator
 from django.conf import settings
 # Create your models here.
 
@@ -30,7 +30,7 @@ class Book(models.Model) :
     # Picture
     cover = models.BinaryField(null=True, editable=True)
     content_type = models.CharField(max_length=255, null=True, help_text='The MIMEType of the file')
-
+    flowers = models.IntegerField(validators=[MinValueValidator(0,"flower number must be greater than 0!")])
     comments = models.ManyToManyField(settings.AUTH_USER_MODEL,
                        through='Comment', related_name='comments_owned')
 
@@ -58,7 +58,26 @@ class Fav(models.Model) :
         return '%s likes %s'%(self.user.username, self.book.title[:10])
 
 
+class SignIn(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    text = models.CharField(
+            max_length=255,
+            validators=[MinLengthValidator(2, "Title must be greater than 2 characters")]
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class User_info(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    # users get flowers from another user or sign in every day.
+    name = models.CharField(max_length=255)
+    flowers = models.IntegerField(validators=[MinValueValidator(0, "flower number cannot be less than 0!")])
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class Chapter(models.Model):
+    index = models.IntegerField(validators=[MinValueValidator(1,"chapter number must be greater than 0!")])
     name = models.CharField(max_length=50)
     text = models.TextField(
         validators=[MinLengthValidator(50, "content must be greater than 50 characters")]
@@ -71,6 +90,8 @@ class Chapter(models.Model):
     def __str__(self):
         if len(self.text) < 15: return self.text
         return self.text[:11] + ' ...'
+
+
 
 
 class Comment(models.Model) :
@@ -87,3 +108,9 @@ class Comment(models.Model) :
     def __str__(self):
         if len(self.text) < 15: return self.text
         return self.text[:11] + ' ...'
+
+
+class Gifted(models.Model):
+    flower = models.IntegerField(validators=[MinValueValidator(1,"flower number must be greater than 0!")])
+    giver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    recipient = models.ForeignKey(Book, on_delete=models.CASCADE)
