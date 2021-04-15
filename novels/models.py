@@ -30,7 +30,7 @@ class Book(models.Model) :
     # Picture
     cover = models.BinaryField(null=True, editable=True)
     content_type = models.CharField(max_length=255, null=True, help_text='The MIMEType of the file')
-    flowers = models.IntegerField(validators=[MinValueValidator(0,"flower number must be greater than 0!")])
+    flowers = models.IntegerField(default=0, validators=[MinValueValidator(0,"flower number must be greater than 0!")])
     comments = models.ManyToManyField(settings.AUTH_USER_MODEL,
                        through='Comment', related_name='comments_owned')
 
