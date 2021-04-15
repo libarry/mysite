@@ -12,95 +12,155 @@
   display: none;
   background-color: rgba(0,0,0,0.5); /*dim the background*/
 }
-#tag_list
-{
-display:block;
-white-space:nowrap;
-width:500px;
-overflow:auto;
+.label-info {
+    font-size: 10px;
 }
-#tag_list li
-{
-width:80px;
-height:80px;
-margin:3px;
-background:red;
-display:inline-block;
+ul{
+    　list-style-type:none;
 }
+ul li{
+    display:inline;
+}
+#tag-in{
+    background-color:transparent;
+    {#padding-top:0;#}
+    {#padding-bottom:0;#}
+    border:0;
+    width: 30px;
+}
+
 </style>
 {% endblock %}
 
+
 {% block content %}
+    <br/>
+    <div class="container-fluid">
+      <div class="row">
 
-{% if book.content_type %}
-    <div id="overlay" class="overlay" style="text-align: center;"
-       onclick="document.getElementById('overlay').style.display = 'none';" >
-        <img style="width:90%;margin-top: 50px; border:3px solid black;" src="{% url 'novels:book_cover' book.id %}">
+        <div class="col-md-3">
+            {% if book.content_type %}
+                <img  src="{% url 'novels:book_cover' book.id %}"
+                    onclick="document.getElementById('overlay').style.display = 'block';" width="100%">
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h1>{{ book.title }}</h1>
+            <p>({{ book.updated_at|naturaltime }})
+            {% if book.owner == user %}
+                <a href="{% url 'novels:book_update' book.id %}"><i class="fa fa-pencil"></i></a>
+                <a href="{% url 'novels:book_delete' book.id %}"><i class="fa fa-trash"></i></a>
+            {% endif %}
+            </p>
+            <br/>
+            <p>Category: {{ book.category }}</p>
+            <br/>
+            <p>{{ book.description }}</p>
+            <br/>
+            <div style="display:inline">
+                <span id="tag_list" style="float:left">
+                Tags:
+                    {% for tag in tags %}
+                        <span class="badge badge-warning tags"><a href="{% url 'novels:tag_list' tag.name%}">{{ tag.name }}</a></span>
+                    {% endfor %}
+                <span id="add_label" class="badge badge-warning"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                </span>
+
+            </div>
+        </div>
+      </div>
     </div>
-{% endif %}
+    <br/>
 
-<span style="float: right;">
-    ({{ book.updated_at|naturaltime }})
-    {% if book.owner == user %}
-        <a href="{% url 'novels:book_update' book.id %}"><i class="fa fa-pencil"></i></a>
-        <a href="{% url 'novels:book_delete' book.id %}"><i class="fa fa-trash"></i></a>
-    {% endif %}
-</span>
-<h1>{{ book.title }}</h1>
-{% if book.content_type %}
-<img style="float:right; max-width:50%;" src="{% url 'novels:book_cover' book.id %}"
-    onclick="document.getElementById('overlay').style.display = 'block';">
-{% endif %}
-
-<p>Category: {{ book.category }}</p>
-<p>{{ ad.description }}</p>
-
-<div id="tag_list">
+    <p>table of contents:</p>
     <ul>
-        {% for tag in tags %}
-        <li>
-            {{ tag.name }}
-        </li>
+        {% for chapter in chapters %}
+            <li>
+                <a href="{% url 'novels:chapter_detail' chapter.id %}">{{ forloop.counter }}: {{ chapter.name }}   </a>
+            </li>
         {% endfor %}
     </ul>
-</div>
 
+     {% if book.owner == user %}
+        {#<input id="tag-in" type="text" name="tag">#}
+        <p>
+        <a href="{% url 'novels:chapter_create' book.id%}">Add a chapter</a>
+        </p>
+    {% endif %}
 
-{% if book.owner == user %}
-    <p>
-    <a href="{% url 'novels:chapter_create' book.id%}">Add a chapter</a>
+    {% if user.is_authenticated %}
+        <br clear="all"/>
+        <p>
+        {% load crispy_forms_tags %}
+            <form method="post" action="{% url 'novels:book_comment_create' book.id %}">
+            {% csrf_token %}
+            {{ comment_form|crispy }}
+            <input type="submit" value="Submit">
+            </form>
+        </p>
+    {% endif %}
+
+    {% for comment in comments %}
+    <p> {{ comment.text }}
+    ({{ comment.updated_at|naturaltime }})
+    {% if user == comment.owner %}
+    <a href="{% url 'novels:book_comment_delete' comment.id %}"><i class="fa fa-trash"></i></a>
+    {% endif %}
     </p>
-{% endif %}
-
-<ul>
-    {% for chapter in chapters %}
-    <li>
-        <a href="{% url 'novels:chapter_detail' chapter.id %}">  {{ chapter.name }} </a>
-    </li>
     {% endfor %}
-</ul>
+    <p>
+    <a href="{% url 'novels:all' %}">All books</a>
+    </p>
 
-{% if user.is_authenticated %}
-<br clear="all"/>
-<p>
-{% load crispy_forms_tags %}
-    <form method="post" action="{% url 'novels:book_comment_create' book.id %}">
-    {% csrf_token %}
-    {{ comment_form|crispy }}
-    <input type="submit" value="Submit">
-    {#<input type="submit" value="All Books" onclick="window.location.href='{% url 'novels:all' %}';return false;">#}
-    </form>
-</p>
-{% endif %}
+    <script type="text/javascript">
 
-{% for comment in comments %}
-<p> {{ comment.text }}
-({{ comment.updated_at|naturaltime }})
-{% if user == comment.owner %}
-<a href="{% url 'novels:book_comment_delete' comment.id %}"><i class="fa fa-trash"></i></a>
-{% endif %}
-</p>
-<p>                                                                                                {% endfor %}
-<a href="{% url 'novels:all' %}">All books</a>
-</p>
+        $("#tag_list").on('mouseenter','.tags',function(){
+            $(this).append('<a id="del" href="#" onclick = "delete_tag($(this).parent())"><i class="fa fa-times" aria-hidden="true"></i></a>');
+        }
+        );
+        $("#tag_list").on('mouseleave','.tags',function(){
+                $(".badge #del").remove();
+            }
+        );
+        $("#add_label").on('mouseenter',function (){
+            $(this).html('<input type="text" id="tag-in">');
+            $("#tag-in").keydown(function(event){
+                if(event.keyCode ==13){
+                    tag_temp = $("#tag-in").val();
+                     $.ajax({
+                         url: '{% url 'novels:tag' %}',
+                         type: 'post',
+                         data: {pk:{{ book.id }}, tag:tag_temp,
+                             csrfmiddlewaretoken:$('[name="csrfmiddlewaretoken"]').val()},
+                         success: function (data){
+                             console.log(data);
+                             if(!data['tag_exist']){
+                                 $('#add_label').before('<span class="badge badge-warning tags"><a href="/tag/'+tag_temp+'">'+tag_temp+'</a></span>\
+                                     ');
+                             }
+                             $("#tag-in").val("");
+                         }
+                    })
+                };
+            });
+        });
+        $("#add_label").on('mouseleave',function(){
+                $(this).html('<i class="fa fa-plus" aria-hidden="true"></i>');
+        });
+        function delete_tag(tag){
+            console.log(tag.text());
+            $.ajax({
+                         url: '{% url 'novels:tag_delete' %}',
+                         type: 'post',
+                         data: {pk:{{ book.id }}, tag:tag.text(),
+                             csrfmiddlewaretoken:$('[name="csrfmiddlewaretoken"]').val()},
+                         success: function (data){
+                             console.log(data);
+                             tag.remove()
+                         }
+                    })
+
+            return false;
+        }
+    </script>
 {% endblock %}

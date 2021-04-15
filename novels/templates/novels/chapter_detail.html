@@ -2,11 +2,11 @@
 {% load humanize %}
 {% block content %}
 
-<h1>{{ chapter.title }}</h1>
+<h1>{{ chapter.name }}</h1>
 
 <span style="float: right;">
     ({{ chapter.updated_at|naturaltime }})
-    {% if book.owner == user %}
+    {% if chapter.book.owner == user %}
         <a href="{% url 'novels:chapter_update' chapter.id %}"><i class="fa fa-pencil"></i></a>
         <a href="{% url 'novels:chapter_delete' chapter.id %}"><i class="fa fa-trash"></i></a>
     {% endif %}

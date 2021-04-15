@@ -8,7 +8,7 @@
     </div>
     <!-- https://stackoverflow.com/questions/22047251/django-dynamically-get-view-url-and-check-if-its-the-current-page -->
     <ul class="nav navbar-nav">
-      {% url 'novels' as novels %}
+      {% url 'novels:all' as novels %}
       <li {% if request.get_full_path == novels %}class="active"{% endif %}>
           <a href="{% url 'novels:all' %}">Books</a></li>
     </ul>
@@ -17,7 +17,7 @@
         <li>
         <a href="{% url 'novels:book_create' %}">Create Book</a>
         </li>
-        <li class="dropdown">
+        <li class="dropdown mr-sm-2">
             <a href="#" data-toggle="dropdown" class="dropdown-toggle">
                 <img style="width: 25px;" src="{{ user|gravatar:60 }}"/><b class="caret"></b>
             </a>
