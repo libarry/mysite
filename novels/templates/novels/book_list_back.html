@@ -1,0 +1,59 @@
+{% extends "base_menu.html" %}
+
+{% block content %}
+    <h1>{{ title }}:</h1>
+    {% if book_list %}
+        <div class="container">
+          <div class="row">
+              {% for book in book_list %}
+              <div class="col-md-4">
+                  <div class="card" style="width: 18rem;">
+                  <img class="card-img-top img-rounded" src="{% url 'novels:book_cover' book.id %}" alt="Card image cap" >
+                  <div class="card-body" >
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text" >{{ book.description }}</p>
+                    <a href="{% url 'novels:book_detail'  book.id %}" class="btn btn-primary">Read</a>
+                      {% if user.is_authenticated %}
+                        <!-- Two hrefs with two stacked icons each - one showing and one hidden -->
+                        <a href="#" onclick=
+                            "favPost('{% url 'novels:book_unfavorite' book.id %}', {{ book.id }} );return false;"
+                            {% if book.id not in favorites %} style="display: none;" {% endif %}
+                            id="favorite_star_{{book.id}}">
+                        <span class="fa-stack" style="vertical-align: middle;">
+                            <i class="fa fa-star fa-stack-1x" style="color: orange;"></i>
+                            <i class="fa fa-star-o fa-stack-1x"></i>
+                        </span>
+                        </a>
+                        <!-- the second href -->
+                        <a href="#" onclick=
+                             "favPost('{% url 'novels:book_favorite' book.id %}', {{ book.id }} );return false;"
+                            {% if book.id in favorites %} style="display: none;" {% endif %}
+                            id="unfavorite_star_{{book.id}}">
+                        <span class="fa-stack" style="vertical-align: middle;">
+                            <i class="fa fa-star fa-stack-1x" style="display: none; color: orange;"></i>
+                            <i class="fa fa-star-o fa-stack-1x"></i>
+                        </span>
+                        </a>
+                      {% endif %}
+                      </div>
+                    </div>
+                  </div>
+              {% endfor %}
+          </div>
+        </div>
+    {% else %}
+        <p>There are no books in the database.</p>
+    {% endif %}
+    <script>
+function favPost(url, book_id) {
+    console.log('Requesting JSON');
+    $.post(url, {},  function(rowz){
+        console.log(url, 'finished');
+        $("#unfavorite_star_"+book_id).toggle();
+        $("#favorite_star_"+book_id).toggle();
+    }).fail(function(xhr) {
+        alert('Url failed with '+xhr.status+' '+url);
+    });
+}
+</script>
+{% endblock %}

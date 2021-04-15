@@ -1,0 +1,46 @@
+{% extends "base_bootstrap.html" %}
+{% block navbar %}
+{% load app_tags %}
+<div class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+  <a class="navbar-brand" href="/">{{ settings.APP_NAME }}</a>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav mr-auto">
+        {% url 'novels:all' as novels %}
+        <li class="nav-item {% if request.get_full_path == novels %}active{% endif %}">
+        <a class="nav-link" href="{% url 'novels:all' %}">Books<span class="sr-only">(current)</span></a>
+        </li>
+{% if user.is_authenticated %}
+    {% url 'novels:book_create' as novels %}
+        <li class="nav-item {% if request.get_full_path == novels %}active{% endif %}">
+            <a class="nav-link" href="{% url 'novels:book_create' %}">Create a Book</a>
+        </li>
+    </ul>
+  </div>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img style="width: 25px;" src="{{ user|gravatar:60 }}"/>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="{% url 'novels:signin_create' %}?next={% url 'novels:signin_list' %}">Daily Flower</a>
+                    <a class="dropdown-item" href="{% url 'logout' %}?next={% url 'novels:all' %}">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+        {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}?next={% url 'novels:all' %}">Login</a>
+            </li>
+            </ul>
+            </div>
+        {% endif %}
+    </div>
+    </div>
+</nav>
+
+
+{% endblock %}

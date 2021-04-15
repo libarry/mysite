@@ -1,0 +1,10 @@
+{% extends "base_menu.html" %}
+{% load humanize %} <!-- https://docs.djangoproject.com/en/3.0/ref/contrib/humanize -->
+{% block content %}
+    <div class="container">
+        {% for signIn in signIn_list %}
+            <p>{{ signIn.user.user_info.name }}:{{ signIn.text }}</p>
+            <br/>
+        {% endfor %}
+    </div>
+{% endblock %}
