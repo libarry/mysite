@@ -77,7 +77,7 @@ class User_info(models.Model):
 
 
 class Chapter(models.Model):
-    index = models.IntegerField(validators=[MinValueValidator(1,"chapter number must be greater than 0!")])
+    index = models.IntegerField(default=0,validators=[MinValueValidator(1,"chapter number must be greater than 0!")])
     name = models.CharField(max_length=50)
     text = models.TextField(
         validators=[MinLengthValidator(50, "content must be greater than 50 characters")]
