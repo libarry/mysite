@@ -24,7 +24,7 @@ class Book(models.Model) :
             validators=[MinLengthValidator(2, "Title must be greater than 2 characters")]
     )
     description = models.TextField(validators=[MaxLengthValidator(1000, "Title must be less than 1000 characters")])
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,null=True, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
     category = models.ForeignKey(Category,null=True,on_delete=models.SET_NULL)
     # Picture
