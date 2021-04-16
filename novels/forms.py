@@ -13,7 +13,7 @@ class CreateBookForm(forms.ModelForm):
     # Call this 'picture' so it gets copied from the form to the in-memory model
     # It will not be the "bytes", it will be the "InMemoryUploadedFile"
     # because we need to pull out things like content_type
-    cover = forms.FileField(required=False, label='File to Upload <= '+max_upload_limit_text)
+    cover = forms.FileField(required=False, label='Cover File to Upload <= '+max_upload_limit_text)
     upload_field_name = 'cover'
 
     # Hint: this will need to be changed for use in the ads application :)
@@ -49,7 +49,7 @@ class CreateBookForm(forms.ModelForm):
 class CreateChapterForm(forms.ModelForm):
     class Meta:
         model = Chapter
-        fields = ['name','text']
+        fields = ['index', 'name', 'text']
 
 
 class CreateSignInForm(forms.ModelForm):

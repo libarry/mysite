@@ -1,24 +1,42 @@
 {% extends "base_menu.html" %}
 {% load humanize %}
 {% block content %}
-
-<h1>{{ chapter.name }}</h1>
-
-<span style="float: right;">
-    ({{ chapter.updated_at|naturaltime }})
-    {% if chapter.book.owner == user %}
-        <a href="{% url 'novels:chapter_update' chapter.id %}"><i class="fa fa-pencil"></i></a>
-        <a href="{% url 'novels:chapter_delete' chapter.id %}"><i class="fa fa-trash"></i></a>
+    <div class="row">
+        <div class="col-md-4">
+        <h1>{{ chapter.name }}</h1>
+        </div>
+        <div class="col-md-8">
+        <span style="float: right;">
+            ({{ chapter.updated_at|naturaltime }})
+            {% if chapter.book.owner == user %}
+                <a href="{% url 'novels:chapter_update' chapter.id %}"><i class="fa fa-pencil"></i></a>
+                <a href="{% url 'novels:chapter_delete' chapter.id %}"><i class="fa fa-trash"></i></a>
+            {% endif %}
+        </span>
+        </div>
+    </div>
+<div class="row">
+<div class="col-md-8">
+    <p>
+    {{ chapter.text }}
+    </p>
+</div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+    {% if previous %}
+        <button type="button" class="btn btn-light"><a class="text-left" href="{% url 'novels:chapter_detail' previous.id %}">Previous</a></button>
     {% endif %}
-</span>
-
-<p>
-{{ chapter.text }}
-</p>
-
-<p>
-    <a href="{% url 'novels:book_detail' chapter.book.id%}">Go back</a>
-</p>
+    </div>
+    <div class="col-md-4">
+        <button type="button" class="btn btn-light"><a href="{% url 'novels:book_detail' chapter.book.id%}">Book Detail</a></button>
+    </div>
+    <div class="col-md-4">
+    {% if next %}
+        <button type="button" class="btn btn-light"><a href="{% url 'novels:chapter_detail' next.id %}">Next</a></button>
+    {% endif %}
+    </div>
+</div>
 
 <p>
     <a href="{% url 'novels:all' %}">All books</a>

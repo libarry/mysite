@@ -77,6 +77,7 @@ class SignInCreateView(LoginRequiredMixin, View):
         pic.user = self.request.user
         pic.user.user_info.flowers += 1
         pic.save()
+        pic.user.user_info.save()
         return redirect(reverse_lazy('novels:signin_list'))
 
 
@@ -111,17 +112,18 @@ class BookDetailView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
     def post(self, request, pk):
-        flower = int(request.POST.get('number'))
         book = Book.objects.get(id=pk)
-        user = request.user
-        user.user_info.flowers -= flower
-        book.owner.user_info.flowers += flower
-        book.flowers += flower
-        gifted = Gifted(flower=flower, recipient=book, giver=user)
-        gifted.save()
-        book.save()
-        user.user_info.save()
-        book.owner.user_info.save()
+        if(request.user!=book.owner):
+            flower = int(request.POST.get('number'))
+            user = request.user
+            user.user_info.flowers -= flower
+            book.owner.user_info.flowers += flower
+            book.flowers += flower
+            gifted = Gifted(flower=flower, recipient=book, giver=user)
+            gifted.save()
+            book.save()
+            user.user_info.save()
+            book.owner.user_info.save()
         return redirect(reverse_lazy('novels:book_detail', kwargs={'pk': book.id}))
 
 class BookDeleteView(OwnerDeleteView):
@@ -186,7 +188,9 @@ class ChapterDetailView(OwnerDetailView):
 
     def get(self, request, ck):
         x = Chapter.objects.get(id=ck)
-        context = {'chapter': x}
+        previous = Chapter.objects.filter(index=x.index-1).first()
+        nxt = Chapter.objects.filter(index=x.index+1).first()
+        context = {'chapter': x, 'previous': previous, 'next': nxt}
         return render(request, self.template_name, context)
 
 

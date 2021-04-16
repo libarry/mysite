@@ -24,6 +24,7 @@
                     <img style="width: 25px;" src="{{ user|gravatar:60 }}"/>
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="#" >{{ user.user_info.flowers }} flowers</a>
                     <a class="dropdown-item" href="{% url 'novels:signin_create' %}?next={% url 'novels:signin_list' %}">Daily Flower</a>
                     <a class="dropdown-item" href="{% url 'logout' %}?next={% url 'novels:all' %}">Logout</a>
                 </div>
